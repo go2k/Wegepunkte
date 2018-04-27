@@ -1,10 +1,12 @@
 package wegepunkte.sabel.com.wegepunkte;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Objects;
 
-public class Wegepunkt {
+public class Wegepunkt implements Serializable{
     private Date timestamp;
     private double lat;
     private double lon;
@@ -62,7 +64,8 @@ public class Wegepunkt {
     @Override
     public String toString() {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-        simpleDateFormat.format(timestamp);
-        return "" + simpleDateFormat.toString() + "\t" + lat + "\t" + lon;
+
+        return "" + simpleDateFormat.format(timestamp) + "  " + String.format(Locale.GERMANY,"%.4f",lat) + "  " + String.format(Locale.GERMANY,"%.4f",lon);
     }
+
 }

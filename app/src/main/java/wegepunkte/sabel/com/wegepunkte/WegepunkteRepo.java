@@ -1,10 +1,11 @@
 package wegepunkte.sabel.com.wegepunkte;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class WegepunkteRepo {
+public class WegepunkteRepo implements Serializable{
 
     private List<Wegepunkt> list;
 
@@ -21,6 +22,9 @@ public class WegepunkteRepo {
             return list.get(index);
         }
         return null;
+    }
+    public List<Wegepunkt> getWegepunkte() {
+        return list;
     }
 
     public int size() {

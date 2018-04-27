@@ -2,10 +2,12 @@ package wegepunkte.sabel.com.wegepunkte;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -24,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Button btnAdd;
     private Button btnShow;
+    private Button btnRoute;
     private WegepunkteRepo wegepunkte;
     private LocationManager locationManager;
     private boolean isGPSEnabled;
@@ -46,9 +49,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState, persistentState);
         initComponents();
         initEvents();
+        wegepunkte = new WegepunkteRepo();
         isGPSEnabled = false;
-
     }
+
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -65,20 +70,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        initComponents();
-        initEvents();
-        wegepunkte = new WegepunkteRepo();
-    }
-
     private void initEvents() {
+
+        btnRoute.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                zeigeRoute();
+            }
+        });
+
         btnShow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
+                //Log.d("***", wegepunkte.toString());
+                Intent intent = new Intent(MainActivity.this, ListViewActivity.class);
+                intent.putExtra("WEGEPUNKTE", wegepunkte);
+                startActivity(intent);
 
             }
         });
@@ -114,15 +122,36 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                 }
-
+                Log.d("wp", "######################################################################");
                 Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 if (location != null) {
                     Wegepunkt wegepunkt = new Wegepunkt(new Date(), location.getLatitude(), location.getLongitude());
                     wegepunkte.addWegepunkt(wegepunkt);
                     Log.d("wp", wegepunkt.toString());
+                    //Toast.makeText(MainActivity.this,wegepunkt.toString(),  Toast.LENGTH_LONG).show();
                 }
+                Log.d("wp", "######################################################################");
             }
         });
+    }
+
+    private void zeigeRoute() {
+
+        if (wegepunkte.size() > 0) {
+
+
+            Wegepunkt start = wegepunkte.getWegepunkt(0);
+            Wegepunkt stop = wegepunkte.getWegepunkt(wegepunkte.size() - 1);
+            double latStart = start.getLat();
+            double lonStart = start.getLon();
+            double latStop = stop.getLat();
+            double lonStop = stop.getLon();
+
+            Intent bwoserInten = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.google.com/maps/dir/?api=1&origin=" + latStart + "," + lonStart + "&destination=" + latStop + "," + lonStop));
+
+            startActivity(bwoserInten);
+        }
+
     }
 
     private void initLocManager() {
@@ -134,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
         btnAdd = findViewById(R.id.btnAdd);
         btnAdd.setEnabled(false);
         btnShow = findViewById(R.id.btnShow);
+        btnRoute = findViewById(R.id.btnRoute);
     }
 
     private void saveOK() {
